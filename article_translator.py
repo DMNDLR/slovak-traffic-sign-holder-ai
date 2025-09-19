@@ -417,12 +417,12 @@ class SlovakCzechTranslator:
         html_tags = ['strong', 'em', 'b', 'i', 'u', 'span']
         for tag in html_tags:
             # Pattern: word character/punctuation directly followed by opening tag
-            result = re.sub(f'([\w.,;:!?])(<{tag}[^>]*>)', r'\1 \2', result, flags=re.UNICODE)
+            result = re.sub(f'([\\w.,;:!?])(<{tag}[^>]*>)', r'\1 \2', result, flags=re.UNICODE)
         
         # PHASE 2: Fix missing spaces after ALL closing formatting tags
         for tag in html_tags:
             # Pattern: closing tag directly followed by word character
-            result = re.sub(f'(</{tag}>)([\w])', r'\1 \2', result, flags=re.UNICODE)
+            result = re.sub(f'(</{tag}>)([\\w])', r'\1 \2', result, flags=re.UNICODE)
         
         # PHASE 3: Special focus on sentence-ending punctuation
         # Google Translate often creates "sentence.<strong>" patterns
@@ -1230,27 +1230,208 @@ class ArticleTranslator:
         return result
 
 def main():
-    parser = argparse.ArgumentParser(description='Translate Slovak articles to Czech for Shoptet')
-    parser.add_argument('url', help='URL of the Slovak article to translate')
-    parser.add_argument('-o', '--output', help='Output directory', default='translated_articles')
-    parser.add_argument('-v', '--verbose', action='store_true', help='Verbose output')
+    # Check if GUI mode (no arguments) or CLI mode
+    import sys
     
-    args = parser.parse_args()
-    
-    try:
-        translator = ArticleTranslator()
-        result = translator.translate_article(args.url, args.output)
+    if len(sys.argv) == 1:
+        # No arguments provided - launch GUI
+        launch_gui()
+    else:
+        # Command line arguments provided - use CLI mode
+        parser = argparse.ArgumentParser(description='Translate Slovak articles to Czech for Shoptet')
+        parser.add_argument('url', help='URL of the Slovak article to translate')
+        parser.add_argument('-o', '--output', help='Output directory', default='translated_articles')
+        parser.add_argument('-v', '--verbose', action='store_true', help='Verbose output')
         
-        if args.verbose:
-            print("\n[SUMMARY] Translation Summary:")
-            print(f"Source URL: {args.url}")
-            print(f"Output directory: {args.output}")
-            print(f"Files generated: 3")
-            print(f"Images downloaded: {result['images_count']}")
+        args = parser.parse_args()
+        
+        try:
+            translator = ArticleTranslator()
+            result = translator.translate_article(args.url, args.output)
             
-    except Exception as e:
-        print(f"[X] Error: {str(e)}")
-        exit(1)
+            if args.verbose:
+                print("\n[SUMMARY] Translation Summary:")
+                print(f"Source URL: {args.url}")
+                print(f"Output directory: {args.output}")
+                print(f"Files generated: 3")
+                print(f"Images downloaded: {result['images_count']}")
+                
+        except Exception as e:
+            print(f"[X] Error: {str(e)}")
+            exit(1)
+
+def launch_gui():
+    """Launch the GUI version of the translator"""
+    import tkinter as tk
+    from tkinter import ttk, messagebox, filedialog
+    import threading
+    import webbrowser
+    from pathlib import Path
+    
+    class TranslatorGUI:
+        def __init__(self, root):
+            self.root = root
+            self.root.title("Slovak to Czech Article Translator")
+            self.root.geometry("600x500")
+            self.root.configure(bg='#f0f0f0')
+            
+            # Style
+            style = ttk.Style()
+            style.theme_use('clam')
+            
+            # Main frame
+            main_frame = ttk.Frame(root, padding="20")
+            main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+            
+            # Title
+            title_label = ttk.Label(main_frame, text="Slovak to Czech Article Translator", 
+                                  font=('Arial', 16, 'bold'))
+            title_label.grid(row=0, column=0, columnspan=2, pady=(0, 20))
+            
+            # URL input
+            ttk.Label(main_frame, text="Article URL:", font=('Arial', 10)).grid(row=1, column=0, sticky=tk.W, pady=(0, 5))
+            self.url_var = tk.StringVar()
+            self.url_entry = ttk.Entry(main_frame, textvariable=self.url_var, font=('Arial', 10))
+            self.url_entry.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 20))
+            
+            # Output directory
+            ttk.Label(main_frame, text="Output Directory:", font=('Arial', 10)).grid(row=3, column=0, sticky=tk.W, pady=(0, 5))
+            self.output_var = tk.StringVar(value=str(Path.cwd()))
+            output_frame = ttk.Frame(main_frame)
+            output_frame.grid(row=4, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 20))
+            self.output_entry = ttk.Entry(output_frame, textvariable=self.output_var, font=('Arial', 10))
+            self.output_entry.grid(row=0, column=0, sticky=(tk.W, tk.E))
+            ttk.Button(output_frame, text="Browse", command=self.browse_output).grid(row=0, column=1, padx=(5, 0))
+            output_frame.columnconfigure(0, weight=1)
+            
+            # Translate button
+            self.translate_btn = ttk.Button(main_frame, text="Translate Article", 
+                                          command=self.start_translation, 
+                                          style='Accent.TButton')
+            self.translate_btn.grid(row=5, column=0, columnspan=2, pady=20)
+            
+            # Progress bar
+            self.progress = ttk.Progressbar(main_frame, mode='indeterminate')
+            self.progress.grid(row=6, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
+            
+            # Status text
+            self.status_var = tk.StringVar(value="Ready to translate")
+            self.status_label = ttk.Label(main_frame, textvariable=self.status_var, font=('Arial', 9))
+            self.status_label.grid(row=7, column=0, columnspan=2)
+            
+            # Log area
+            ttk.Label(main_frame, text="Translation Log:", font=('Arial', 10)).grid(row=8, column=0, sticky=tk.W, pady=(20, 5))
+            self.log_text = tk.Text(main_frame, height=10, font=('Consolas', 9), bg='#f8f8f8')
+            self.log_text.grid(row=9, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
+            
+            # Result buttons frame
+            self.result_frame = ttk.Frame(main_frame)
+            self.result_frame.grid(row=10, column=0, columnspan=2, pady=(10, 0))
+            
+            # Configure grid weights
+            main_frame.columnconfigure(0, weight=1)
+            root.columnconfigure(0, weight=1)
+            root.rowconfigure(0, weight=1)
+            main_frame.rowconfigure(9, weight=1)
+            
+            self.translator = None
+            self.result = None
+            
+        def browse_output(self):
+            directory = filedialog.askdirectory(initialdir=self.output_var.get())
+            if directory:
+                self.output_var.set(directory)
+                
+        def log_message(self, message):
+            self.log_text.insert(tk.END, message + "\n")
+            self.log_text.see(tk.END)
+            self.root.update_idletasks()
+            
+        def start_translation(self):
+            url = self.url_var.get().strip()
+            if not url:
+                messagebox.showerror("Error", "Please enter a URL")
+                return
+                
+            if not url.startswith(('http://', 'https://')):
+                messagebox.showerror("Error", "Please enter a valid URL (starting with http:// or https://)")
+                return
+                
+            # Clear previous results
+            self.log_text.delete(1.0, tk.END)
+            for widget in self.result_frame.winfo_children():
+                widget.destroy()
+                
+            # Start translation in thread
+            self.translate_btn.configure(state='disabled', text='Translating...')
+            self.progress.start(10)
+            self.status_var.set("Translation in progress...")
+            
+            thread = threading.Thread(target=self.translate_article, args=(url,))
+            thread.daemon = True
+            thread.start()
+            
+        def translate_article(self, url):
+            try:
+                self.translator = ArticleTranslator()
+                output_dir = self.output_var.get()
+                
+                # Override print function to log to GUI
+                import builtins
+                original_print = builtins.print
+                def gui_print(*args, **kwargs):
+                    message = ' '.join(str(arg) for arg in args)
+                    self.root.after(0, lambda: self.log_message(message))
+                    original_print(*args, **kwargs)
+                builtins.print = gui_print
+                
+                # Perform translation
+                self.result = self.translator.translate_article(url, output_dir)
+                
+                # Restore original print
+                builtins.print = original_print
+                
+                # Update GUI on success
+                self.root.after(0, self.translation_completed)
+                
+            except Exception as e:
+                # Restore original print
+                import builtins
+                builtins.print = original_print if 'original_print' in locals() else print
+                
+                error_msg = str(e)
+                self.root.after(0, lambda: self.translation_failed(error_msg))
+                
+        def translation_completed(self):
+            self.progress.stop()
+            self.translate_btn.configure(state='normal', text='Translate Article')
+            self.status_var.set("Translation completed successfully!")
+            
+            # Add result buttons
+            if self.result and 'article_folder' in self.result:
+                folder_path = self.result['article_folder']
+                
+                ttk.Button(self.result_frame, text="Open Output Folder", 
+                         command=lambda: webbrowser.open(f"file:///{folder_path}")).pack(side=tk.LEFT, padx=5)
+                
+                if 'html_file' in self.result:
+                    html_file = self.result['html_file']
+                    ttk.Button(self.result_frame, text="Open Article HTML", 
+                             command=lambda: webbrowser.open(f"file:///{html_file}")).pack(side=tk.LEFT, padx=5)
+                             
+                messagebox.showinfo("Success", f"Translation completed!\nOutput folder: {folder_path}")
+                
+        def translation_failed(self, error_msg):
+            self.progress.stop()
+            self.translate_btn.configure(state='normal', text='Translate Article')
+            self.status_var.set("Translation failed")
+            self.log_message(f"ERROR: {error_msg}")
+            messagebox.showerror("Translation Failed", f"Translation failed:\n{error_msg}")
+            
+    # Create and run GUI
+    root = tk.Tk()
+    app = TranslatorGUI(root)
+    root.mainloop()
 
 if __name__ == "__main__":
     main()

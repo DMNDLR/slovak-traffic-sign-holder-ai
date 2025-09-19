@@ -1,0 +1,49 @@
+Subject: Slovak-Czech Article Translator - Ready to Use Package
+
+Hi [Colleague's Name],
+
+I've created a tool that automatically translates Slovak articles to Czech, and I'm sharing it with you!
+
+🎯 WHAT IT DOES:
+- Takes any Slovak article URL (like from softwareshop.sk)
+- Translates everything to Czech automatically  
+- Downloads all images
+- Creates clean HTML ready for your website
+- Fixes all formatting and spacing
+
+📦 HOW TO INSTALL:
+1. Download the attached ZIP file
+2. Right-click the ZIP → "Extract All"
+3. Double-click "START_TRANSLATOR.bat"
+4. That's it!
+
+⚡ HOW TO USE:
+1. Copy a Slovak article URL
+2. Paste it in the translator window
+3. Click "Translate Article"  
+4. Wait 1-2 minutes
+5. Check the output folder that opens
+
+🛡️ SAFETY NOTE:
+Windows might show a security warning - just click "More info" → "Run anyway"
+
+📋 WHAT YOU GET:
+- Clean Czech HTML (copy into your CMS)
+- All article images (ready to upload)
+- SEO title and description
+- Everything organized in folders
+
+🆘 IF YOU NEED HELP:
+- Read "README_FIRST.txt" in the extracted folder
+- Try "TEST_TRANSLATOR.bat" to check if it works
+- Email me if you get stuck!
+
+The tool is completely free for personal/business use. It should save you hours of manual translation work!
+
+Let me know how it works for you.
+
+Best regards,
+Viktor
+
+---
+P.S. Make sure to keep the extracted folder - don't delete it after using once!

@@ -1028,6 +1028,10 @@ class ArticleTranslator:
         soup_str = str(soup)
         # Remove HTML comments like <!-- CTA blok: kontaktujte nás -->
         soup_str = re.sub(r'<!--.*?-->', '', soup_str, flags=re.DOTALL)
+        
+        # Remove CTA block labels that appear as plain text (keep the button blocks)
+        soup_str = re.sub(r'Blok CTA:[^<]*', '', soup_str, flags=re.IGNORECASE)
+        
         soup = BeautifulSoup(soup_str, 'html.parser')
         
         # Keep all other images in the content
@@ -1091,17 +1095,31 @@ class ArticleTranslator:
             content_div = clean_content.find('div', class_='text')
             if content_div:
                 # Write the content div with all its children (including any images)
-                f.write(str(content_div))
+                content_html = str(content_div)
             else:
                 # If no text div found, write the whole cleaned content
                 # Remove the article wrapper but keep everything else
                 if clean_content.name == 'article':
                     # Write all children of the article tag
+                    content_html = ''
                     for child in clean_content.children:
                         if hasattr(child, 'name') and child.name:  # Skip text nodes
-                            f.write(str(child))
+                            content_html += str(child)
                 else:
-                    f.write(str(clean_content))
+                    content_html = str(clean_content)
+            
+            # FINAL SPACING FIX: Ensure perfect spacing around <strong> and <em> tags
+            content_html = re.sub(r'([^\s])(<strong[^>]*>)', r'\1 \2', content_html)
+            content_html = re.sub(r'(</strong>)([^\s])', r'\1 \2', content_html)
+            content_html = re.sub(r'([^\s])(<em[^>]*>)', r'\1 \2', content_html)
+            content_html = re.sub(r'(</em>)([^\s])', r'\1 \2', content_html)
+            
+            # Remove CTA block labels (but keep the button blocks)
+            content_html = re.sub(r'Blok CTA:[^<\n]*', '', content_html, flags=re.IGNORECASE)
+            
+            content_html = re.sub(r' {2,}', ' ', content_html)  # Clean up double spaces
+            
+            f.write(content_html)
         
         # 2. SEO metadata text file
         seo_file = article_folder / "seo_metadata.txt"

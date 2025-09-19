@@ -1,6 +1,10 @@
-# Slovak to Czech Article Translator
+# Slovak → Czech Article Translator
 
-A powerful tool for translating Slovak articles to Czech with automatic HTML processing, image handling, and CTA link replacement.
+🚀 **Powerful tool for translating Slovak articles to Czech with perfect HTML formatting, automatic image processing, and CMS-ready output.**
+
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen.svg)]()
 
 ## 🚀 Quick Start
 
@@ -17,13 +21,15 @@ python article_translator.py "URL" -o "output_folder"
 
 ## ✨ Features
 
-- **Complete Translation**: Comprehensive Slovak → Czech dictionary
-- **Smart Capitalization**: Proper sentence capitalization
-- **HTML Processing**: Preserves HTML structure and formatting
-- **Image Handling**: Downloads and organizes images
-- **CTA Link Replacement**: Intelligently updates Slovak links to Czech equivalents
-- **SEO Metadata**: Translates titles, descriptions, and keywords
-- **Clean Output**: Removes headers, organizes content for easy publishing
+- **🎯 Perfect Translation**: High-quality Slovak → Czech translation with technical term preservation
+- **📝 HTML Structure Preservation**: Maintains all formatting, tags, and structure
+- **🔧 Perfect Spacing**: Bulletproof spacing around `<strong>`, `<em>`, and other HTML tags
+- **🖼️ Automatic Image Processing**: Downloads and organizes all article images
+- **🎨 CTA Link Replacement**: Intelligently updates Slovak links to Czech equivalents
+- **📊 SEO Metadata**: Translates titles, descriptions, and keywords
+- **🏢 CMS Ready**: Generates clean output perfect for Shoptet and other CMS platforms
+- **🎤 User-Friendly GUI**: Easy-to-use graphical interface
+- **📁 Organized Output**: Each translation in its own timestamped folder
 
 ## 📁 Output Structure
 

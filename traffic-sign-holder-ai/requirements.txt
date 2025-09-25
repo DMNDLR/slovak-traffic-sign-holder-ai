@@ -1,0 +1,47 @@
+# Core computer vision and ML libraries
+opencv-python==4.8.1.78
+torch==2.1.0
+torchvision==0.16.0
+ultralytics==8.0.200  # YOLO v8
+detectron2 @ git+https://github.com/facebookresearch/detectron2.git
+
+# Image processing
+Pillow==10.0.1
+numpy==1.24.3
+scipy==1.11.3
+
+# OCR libraries
+pytesseract==0.3.10
+paddlepaddle==2.5.1
+paddleocr==2.7.0.3
+
+# Data handling and validation
+pandas==2.1.1
+pydantic==2.4.2
+jsonschema==4.19.1
+
+# GIS and geospatial
+geopandas==0.14.0
+shapely==2.0.2
+pyproj==3.6.1
+
+# Visualization and annotation tools
+matplotlib==3.7.2
+plotly==5.17.0
+streamlit==1.27.2
+
+# Database integration
+sqlalchemy==2.0.21
+sqlite3  # Built-in with Python
+
+# Utilities
+tqdm==4.66.1
+click==8.1.7
+python-dotenv==1.0.0
+loguru==0.7.2
+
+# Development and testing
+pytest==7.4.2
+black==23.9.1
+flake8==6.1.0
+mypy==1.6.0
